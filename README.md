@@ -50,16 +50,19 @@ Reference any `GiftEntry` field value in a rule's WHERE clause using:
 
 ```sql
 -- Match Account by email
-PersonEmail = '{!GiftEntry.Email}' AND IsPersonAccount = true
+-- toSoqlLiteral() adds quotes for String values, so do NOT quote the token
+PersonEmail = {!GiftEntry.Email} AND IsPersonAccount = true
 
 -- Match Account by first + last name
-FirstName = '{!GiftEntry.FirstName}' AND LastName = '{!GiftEntry.LastName}' AND IsPersonAccount = true
+FirstName = {!GiftEntry.FirstName} AND LastName = {!GiftEntry.LastName} AND IsPersonAccount = true
 
 -- Match GiftCommitment using already-resolved DonorId (from step 1)
-DonorId = '{!GiftEntry.DonorId}' AND Status = 'Active'
+DonorId = {!GiftEntry.DonorId} AND Status = 'Active'
 ```
 
 > **Note:** If a token references a field that is `null` on the `GiftEntry`, the rule is skipped and the next rule in priority order is evaluated.
+>
+> **Important:** For String and Id fields, do **not** surround the token with single quotes — `toSoqlLiteral()` adds them automatically. For Date, Boolean, and Decimal fields, no quotes are needed either. Always write tokens as `{!GiftEntry.FieldName}` without surrounding quotes.
 
 ### First-Match-Wins
 
@@ -173,7 +176,7 @@ sf apex run test --class-names GiftEntryMatchingBatchTest --target-org <your-org
    - **Label** — descriptive name (max 40 characters)
    - **Target Field** — e.g. `DonorId`
    - **Target Object** — e.g. `Account`
-   - **SOQL WHERE Clause** — e.g. `PersonEmail = '{!GiftEntry.Email}' AND IsPersonAccount = true`
+   - **SOQL WHERE Clause** — e.g. `PersonEmail = {!GiftEntry.Email} AND IsPersonAccount = true`
    - **Priority** — lower number runs first (e.g. `10`, `20`, `30`)
    - **Weight** — confidence score between `0.0` and `1.0`
    - **Is Active** — checked to enable
@@ -185,8 +188,8 @@ sf apex run test --class-names GiftEntryMatchingBatchTest --target-org <your-org
 Any `GiftEntry` field — including custom fields — can be used in a token. The batch automatically detects which fields your rules reference and adds them to the query. No code changes required.
 
 ```sql
--- Custom field example
-MySegmentCode__c = '{!GiftEntry.MySegmentCode__c}'
+-- Custom field example (no quotes needed around token)
+MySegmentCode__c = {!GiftEntry.MySegmentCode__c}
 ```
 
 ---

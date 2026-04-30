@@ -38,8 +38,10 @@ private class GiftEntryMatchingBatchTest {
     @IsTest
     static void testTokenSubstitution_StringField() {
         Map<String, Object> fm = new Map<String, Object>{ 'LastName' => 'Smith' };
+        // Note: toSoqlLiteral() adds surrounding quotes for String values,
+        // so the template must NOT include them around the token.
         String result = GiftEntryMatchingRuleEvaluator.substituteTokens(
-            'LastName = \'{!GiftEntry.LastName}\'', fm
+            'LastName = {!GiftEntry.LastName}', fm
         );
         Assert.areEqual('LastName = \'Smith\'', result, 'String token should be substituted');
     }
@@ -48,7 +50,7 @@ private class GiftEntryMatchingBatchTest {
     static void testTokenSubstitution_NullFieldSkipsRule() {
         Map<String, Object> fm = new Map<String, Object>{ 'Email' => null };
         String result = GiftEntryMatchingRuleEvaluator.substituteTokens(
-            'Email = \'{!GiftEntry.Email}\'', fm
+            'Email = {!GiftEntry.Email}', fm
         );
         Assert.isNull(result, 'Null token should return null');
     }
@@ -56,7 +58,7 @@ private class GiftEntryMatchingBatchTest {
     @IsTest
     static void testTokenSubstitution_MissingFieldSkipsRule() {
         String result = GiftEntryMatchingRuleEvaluator.substituteTokens(
-            'Email = \'{!GiftEntry.Email}\'', new Map<String, Object>()
+            'Email = {!GiftEntry.Email}', new Map<String, Object>()
         );
         Assert.isNull(result, 'Missing token key should return null');
     }
@@ -170,7 +172,7 @@ private class GiftEntryMatchingBatchTest {
 
         GiftEntryMatchingRule__mdt rule1 = makeRule(
             'MatchByCity_Boston', 'DonorId', 'Account',
-            'BillingCity = \'{!GiftEntry.City}\'', 10, 0.8, true
+            'BillingCity = {!GiftEntry.City}', 10, 0.8, true
         );
         GiftEntryMatchingRule__mdt rule2 = makeRule(
             'MatchByCity_Chicago', 'DonorId', 'Account',
