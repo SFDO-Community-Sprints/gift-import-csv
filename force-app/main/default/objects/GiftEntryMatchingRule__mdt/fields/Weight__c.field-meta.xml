@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Weight__c</fullName>
+    <label>Weight</label>
+    <description>Contribution of this rule to the composite match score (0.0 to 1.0). Stored on the GiftEntry match score field alongside the matched Id. Informational only—does not gate acceptance.</description>
+    <type>Number</type>
+    <precision>3</precision>
+    <scale>2</scale>
+    <required>true</required>
+    <unique>false</unique>
+</CustomField>

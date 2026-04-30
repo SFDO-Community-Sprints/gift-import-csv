@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SoqlWhereClause__c</fullName>
+    <label>SOQL WHERE Clause</label>
+    <description>WHERE clause fragment for the matching SOQL query. Use {!GiftEntry.FieldApiName} tokens to reference GiftEntry field values at runtime. Example: Email = '{!GiftEntry.Email__c}'</description>
+    <type>LongTextArea</type>
+    <length>32768</length>
+    <visibleLines>5</visibleLines>
+</CustomField>

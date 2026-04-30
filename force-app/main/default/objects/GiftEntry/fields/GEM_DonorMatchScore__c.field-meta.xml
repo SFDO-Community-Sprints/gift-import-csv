@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>GEM_DonorMatchScore__c</fullName>
+    <label>GEM Donor Match Score</label>
+    <description>Stores the weight (0.0–1.0) of the matching rule that resolved DonorId. Populated by the Gift Entry Matching batch.</description>
+    <type>Number</type>
+    <precision>3</precision>
+    <scale>2</scale>
+    <required>false</required>
+</CustomField>

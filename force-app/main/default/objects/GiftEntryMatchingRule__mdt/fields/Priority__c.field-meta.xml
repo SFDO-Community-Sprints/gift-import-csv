@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Priority__c</fullName>
+    <label>Priority</label>
+    <description>Execution order within the same TargetField group. Lower number runs first. Stops evaluating further rules once a match is found.</description>
+    <type>Number</type>
+    <precision>6</precision>
+    <scale>0</scale>
+    <required>true</required>
+    <unique>false</unique>
+</CustomField>
