@@ -88,16 +88,47 @@ force-app/main/default/
 ├── classes/
 │   ├── GiftEntryMatchingBatch.cls             # Main batch job
 │   ├── GiftEntryMatchingBatchScheduler.cls    # Schedulable wrapper
+│   ├── GiftEntryMatchingController.cls        # AuraEnabled controller for LWC
 │   ├── GiftEntryMatchingRuleEvaluator.cls     # Token substitution & rule engine
 │   └── GiftEntryMatchingBatchTest.cls         # Test coverage
 ├── customMetadata/
 │   ├── GiftEntryMatchingRule.Donor_Match_By_Email.md-meta.xml
 │   ├── GiftEntryMatchingRule.Donor_Match_By_Name.md-meta.xml
 │   └── GiftEntryMatchingRule.GiftCommitment_Match_By_Donor.md-meta.xml
+├── lwc/
+│   └── giftEntryMatchingAction/               # Lightning component for GiftBatch page
+│       ├── giftEntryMatchingAction.html
+│       ├── giftEntryMatchingAction.js
+│       └── giftEntryMatchingAction.js-meta.xml
 └── objects/
     ├── GiftEntry/fields/                      # 7 GEM_*MatchScore__c fields
     └── GiftEntryMatchingRule__mdt/            # CMT object + fields
 ```
+
+---
+
+## GiftBatch Page Action
+
+A Lightning Web Component (`giftEntryMatchingAction`) is included so users can trigger the matching batch directly from a **GiftBatch record page** — no anonymous Apex required.
+
+### Adding to the GiftBatch Page
+
+1. Open a **GiftBatch** record in Salesforce
+2. Click the **gear icon → Edit Page** to open Lightning App Builder
+3. In the left panel, search for **"Gift Entry Matching"**
+4. Drag the component onto the page (sidebar or main column)
+5. Click **Save → Activate**
+
+### UI States
+
+| State | What the user sees |
+|---|---|
+| **Idle** | "Run Gift Entry Matching" button |
+| **Running** | Spinner with "Submitting batch job…" |
+| **Success** | Green confirmation with the Apex Job ID |
+| **Error** | Red error message with "Try Again" button |
+
+On success, a toast notification also appears with the Job ID. Progress can be monitored under **Setup → Apex Jobs**.
 
 ---
 
