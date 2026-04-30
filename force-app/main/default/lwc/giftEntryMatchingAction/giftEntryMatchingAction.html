@@ -1,0 +1,79 @@
+<template>
+    <lightning-card title="Gift Entry Matching" icon-name="standard:activations">
+
+        <div class="slds-var-m-around_medium">
+
+            <!-- Idle / Ready state -->
+            <template lwc:if={isIdle}>
+                <p class="slds-var-m-bottom_medium slds-text-body_regular">
+                    Run the matching engine to auto-populate donor, commitment,
+                    campaign, and designation lookups on all Gift Entry records
+                    in this batch.
+                </p>
+                <lightning-button
+                    label="Run Gift Entry Matching"
+                    variant="brand"
+                    icon-name="utility:play"
+                    onclick={handleRun}
+                ></lightning-button>
+            </template>
+
+            <!-- Running / Loading state -->
+            <template lwc:elseif={isRunning}>
+                <div class="slds-align_absolute-center slds-var-p-vertical_large">
+                    <lightning-spinner
+                        alternative-text="Submitting batch job..."
+                        size="medium"
+                    ></lightning-spinner>
+                </div>
+                <p class="slds-align_absolute-center slds-text-color_weak">
+                    Submitting batch job&hellip;
+                </p>
+            </template>
+
+            <!-- Success state -->
+            <template lwc:elseif={isSuccess}>
+                <div class="slds-box slds-theme_success slds-var-m-bottom_medium">
+                    <lightning-icon
+                        icon-name="utility:success"
+                        alternative-text="Success"
+                        size="small"
+                        class="slds-var-m-right_x-small"
+                    ></lightning-icon>
+                    <strong>Batch job submitted successfully.</strong>
+                    <p class="slds-var-m-top_x-small slds-text-body_small">
+                        Job ID: <code>{jobId}</code><br/>
+                        Monitor progress in <strong>Setup &rarr; Apex Jobs</strong>.
+                    </p>
+                </div>
+                <lightning-button
+                    label="Run Again"
+                    variant="neutral"
+                    icon-name="utility:refresh"
+                    onclick={handleReset}
+                ></lightning-button>
+            </template>
+
+            <!-- Error state -->
+            <template lwc:elseif={isError}>
+                <div class="slds-box slds-theme_error slds-var-m-bottom_medium">
+                    <lightning-icon
+                        icon-name="utility:error"
+                        alternative-text="Error"
+                        size="small"
+                        class="slds-var-m-right_x-small"
+                    ></lightning-icon>
+                    <strong>Failed to start batch job.</strong>
+                    <p class="slds-var-m-top_x-small slds-text-body_small">{errorMessage}</p>
+                </div>
+                <lightning-button
+                    label="Try Again"
+                    variant="neutral"
+                    icon-name="utility:refresh"
+                    onclick={handleReset}
+                ></lightning-button>
+            </template>
+
+        </div>
+    </lightning-card>
+</template>
