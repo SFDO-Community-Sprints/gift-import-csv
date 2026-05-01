@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>FieldsToCopy__c</fullName>
-    <description>Semicolon-separated list of GiftEntry API field names whose values will be copied from the employee gift entry to the newly created employer gift entry. The batch will skip any field it cannot set (e.g. formula or read-only fields) and log a warning. Example: GiftBatchId;GiftReceivedDate;CurrencyIsoCode;GiftDesignation1Id;GiftDesignation2Id</description>
+    <description>Semicolon-separated list of GiftEntry API field names whose values will be copied from the employee gift entry to the new employer gift entry. Max 255 characters. Example: GiftBatchId;GiftReceivedDate;CurrencyIsoCode;GiftDesignation1Id</description>
     <externalId>false</externalId>
     <label>Fields To Copy (semicolon-separated)</label>
-    <length>1000</length>
     <trackTrending>false</trackTrending>
-    <type>LongTextArea</type>
-    <visibleLines>4</visibleLines>
+    <type>TextArea</type>
 </CustomField>

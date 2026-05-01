@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>EmployeeGiftCondition__c</fullName>
-    <description>SOQL WHERE clause fragment that identifies eligible employee GiftEntry records. The batch appends this to its base query. Example: GEM_MatchAmount__c > 0 AND GEM_MatchingGiftCreated__c = false</description>
+    <description>SOQL WHERE clause fragment that identifies eligible employee GiftEntry records. The batch appends this to its base query. Max 255 characters. Example: GEM_MatchAmount__c > 0 AND GEM_MatchingGiftCreated__c = false</description>
     <externalId>false</externalId>
     <label>Employee Gift Condition (WHERE Clause)</label>
-    <length>1000</length>
     <trackTrending>false</trackTrending>
-    <type>LongTextArea</type>
-    <visibleLines>4</visibleLines>
+    <type>TextArea</type>
 </CustomField>
