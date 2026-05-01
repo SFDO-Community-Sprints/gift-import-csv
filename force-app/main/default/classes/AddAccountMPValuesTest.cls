@@ -152,13 +152,15 @@ private class AddAccountMPValuesTest {
 
     @IsTest
     static void testUpdate_FirstNameChange_RefreshesMP() {
+        // 'John' → MP primary = 'JN'
+        // 'Robert' → MP primary = 'RPRT'  (unambiguously different)
         Account acc = new Account(FirstName = 'John', LastName = 'Smith');
         insert acc;
         String originalCode = [
             SELECT FirstName_MP_Primary__c FROM Account WHERE Id = :acc.Id
         ].FirstName_MP_Primary__c;
 
-        acc.FirstName = 'Jane'; // different phonetic code from 'John'
+        acc.FirstName = 'Robert';
 
         Test.startTest();
         update acc;
