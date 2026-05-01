@@ -3,19 +3,29 @@
 
         <div class="slds-var-m-around_medium">
 
-            <!-- Idle / Ready state -->
+            <!-- Idle / Ready state: two action buttons -->
             <template lwc:if={isIdle}>
                 <p class="slds-var-m-bottom_medium slds-text-body_regular">
                     Run the matching engine to auto-populate donor, commitment,
                     campaign, and designation lookups on all Gift Entry records
                     in this batch.
                 </p>
-                <lightning-button
-                    label="Run Gift Entry Matching"
-                    variant="brand"
-                    icon-name="utility:play"
-                    onclick={handleRun}
-                ></lightning-button>
+                <div class="slds-button-group">
+                    <lightning-button
+                        id="btn-run-matching"
+                        label="Run Gift Entry Matching"
+                        variant="brand"
+                        icon-name="utility:play"
+                        onclick={handleRunMatching}
+                    ></lightning-button>
+                    <lightning-button
+                        id="btn-run-employer-matching"
+                        label="Create Employer Matching Gifts"
+                        variant="neutral"
+                        icon-name="utility:sync"
+                        onclick={handleRunEmployerMatching}
+                    ></lightning-button>
+                </div>
             </template>
 
             <!-- Running / Loading state -->
@@ -27,7 +37,7 @@
                     ></lightning-spinner>
                 </div>
                 <p class="slds-align_absolute-center slds-text-color_weak">
-                    Submitting batch job&hellip;
+                    {runningLabel}&hellip;
                 </p>
             </template>
 
@@ -40,7 +50,7 @@
                         size="small"
                         class="slds-var-m-right_x-small"
                     ></lightning-icon>
-                    <strong>Batch job submitted successfully.</strong>
+                    <strong>{successLabel}</strong>
                     <p class="slds-var-m-top_x-small slds-text-body_small">
                         Job ID: <code>{jobId}</code><br/>
                         Monitor progress in <strong>Setup &rarr; Apex Jobs</strong>.

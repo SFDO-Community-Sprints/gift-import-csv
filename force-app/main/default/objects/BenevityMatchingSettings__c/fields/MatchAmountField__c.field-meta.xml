@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>MatchAmountField__c</fullName>
+    <description>API name of the GiftEntry field that holds the employer matching gift amount imported from the Benevity Match Amount column. This field value becomes the GiftAmount on the new employer GiftEntry record. Example: GEM_MatchAmount__c</description>
+    <externalId>false</externalId>
+    <label>Match Amount Field API Name</label>
+    <length>100</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

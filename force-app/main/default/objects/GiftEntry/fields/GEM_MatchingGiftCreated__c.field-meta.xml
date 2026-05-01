@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>GEM_MatchingGiftCreated__c</fullName>
+    <description>Set to true by BenevityEmployerMatchingBatch after a corresponding employer GiftEntry has been created. Prevents duplicate processing on subsequent batch runs. Use this field in the EmployeeGiftCondition__c setting: GEM_MatchingGiftCreated__c = false</description>
+    <defaultValue>false</defaultValue>
+    <externalId>false</externalId>
+    <label>GEM Matching Gift Created</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

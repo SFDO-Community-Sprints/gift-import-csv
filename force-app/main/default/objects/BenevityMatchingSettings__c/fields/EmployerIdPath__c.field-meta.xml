@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EmployerIdPath__c</fullName>
+    <description>SOQL dot-notation path to the employer Account Id on the employee donor's related Account record. The batch includes this in the SELECT clause and traverses it to find the employer. Example: Donor.Employer__c (for a standard relationship named Donor with a field Employer__c on Account). Supports multi-level paths: Donor.Parent.Employer__c</description>
+    <externalId>false</externalId>
+    <label>Employer ID Field Path</label>
+    <length>255</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>
