@@ -140,7 +140,7 @@ private class GiftEntryMPTriggerTest {
             String codeBeforeUpdate = (String) Database.query(
                 'SELECT FirstName_MP_Primary__c FROM GiftEntry WHERE Id = \''
                 + entry.get('Id') + '\''
-            ).get('FirstName_MP_Primary__c');
+            )[0].get('FirstName_MP_Primary__c');
 
             entry.put('FirstName', 'Xavier'); // very different phonetic code
             Database.update(entry, false);
@@ -148,7 +148,7 @@ private class GiftEntryMPTriggerTest {
             String codeAfterUpdate = (String) Database.query(
                 'SELECT FirstName_MP_Primary__c FROM GiftEntry WHERE Id = \''
                 + entry.get('Id') + '\''
-            ).get('FirstName_MP_Primary__c');
+            )[0].get('FirstName_MP_Primary__c');
 
             Assert.areNotEqual(codeBeforeUpdate, codeAfterUpdate,
                 'MP code should change when FirstName changes on update');
@@ -172,7 +172,7 @@ private class GiftEntryMPTriggerTest {
             String codeBeforeUpdate = (String) Database.query(
                 'SELECT FirstName_MP_Primary__c FROM GiftEntry WHERE Id = \''
                 + entry.get('Id') + '\''
-            ).get('FirstName_MP_Primary__c');
+            )[0].get('FirstName_MP_Primary__c');
 
             // Update a field that is not a name — trigger should not recalculate
             entry.put('PaymentMethod', 'EFT');
@@ -181,7 +181,7 @@ private class GiftEntryMPTriggerTest {
             String codeAfterUpdate = (String) Database.query(
                 'SELECT FirstName_MP_Primary__c FROM GiftEntry WHERE Id = \''
                 + entry.get('Id') + '\''
-            ).get('FirstName_MP_Primary__c');
+            )[0].get('FirstName_MP_Primary__c');
 
             Assert.areEqual(codeBeforeUpdate, codeAfterUpdate,
                 'AddGiftEntryMPValues trigger should not recalculate MP when name is unchanged');
