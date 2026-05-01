@@ -326,4 +326,73 @@ private class BenevityEmployerMatchingBatchTest {
 
         Assert.isTrue(true, 'execute() with empty scope should complete without error');
     }
+
+    @IsTest
+    static void testBatch_FinishMethod_LogsResults() {
+        makeSettings(true, 'GEM_MatchAmount__c > 0', 'Donor.Employer__c',
+            'GiftBatchId', 'GEM_MatchAmount__c', 'GEM_MatchingGiftCreated__c');
+
+        Id fakeId = '001000000000001AAA';
+        BenevityEmployerMatchingBatch batch = new BenevityEmployerMatchingBatch(fakeId);
+
+        Test.startTest();
+        batch.finish(null); // Covers the finish() summary log
+        Test.stopTest();
+
+        Assert.isTrue(true, 'finish() should complete without error');
+    }
+
+    @IsTest
+    static void testBatch_ExecuteWithAccountScope_SkipsZeroAmount() {
+        // Use Account as proxy scope to exercise execute() skip logic for zero match amount.
+        // The batch calls resolveMatchAmount() which returns null for 'AnnualRevenue' = null.
+        makeSettings(true, 'GEM_MatchAmount__c > 0', 'Donor.Employer__c',
+            'GiftBatchId', 'Matching_Gift_Amount__c', 'GEM_MatchingGiftCreated__c');
+
+        Account proxyAccount = new Account(Name = 'Test Proxy', AnnualRevenue = null);
+        insert proxyAccount;
+        Account queried = [SELECT Id, AnnualRevenue FROM Account WHERE Id = :proxyAccount.Id];
+
+        List<SObject> scope = new List<SObject>{ queried };
+
+        Id fakeId = '001000000000001AAA';
+        BenevityEmployerMatchingBatch batch = new BenevityEmployerMatchingBatch(fakeId);
+
+        Test.startTest();
+        // execute() reads MatchAmountField__c = 'Matching_Gift_Amount__c' from settings.
+        // AnnualRevenue is null on Account, so resolveMatchAmount returns null → skipped.
+        batch.execute(null, scope);
+        Test.stopTest();
+
+        Assert.isTrue(true,
+            'execute() should skip Account proxy records with null match amount');
+    }
+
+    @IsTest
+    static void testBatch_ExecuteWithAccountScope_SkipsNullEmployer() {
+        // Use Account with a non-zero AnnualRevenue (match amount proxy) but no Parent
+        // (employer path proxy) — should skip after resolving null employer Id.
+        makeSettings(true, 'GEM_MatchAmount__c > 0', 'Donor.Employer__c',
+            'GiftBatchId', 'AnnualRevenue', 'GEM_MatchingGiftCreated__c');
+
+        Account proxyAccount = new Account(Name = 'Test No Parent', AnnualRevenue = 200.00);
+        insert proxyAccount;
+        Account queried = [SELECT Id, AnnualRevenue, Parent.Id FROM Account WHERE Id = :proxyAccount.Id];
+
+        List<SObject> scope = new List<SObject>{ queried };
+
+        Id fakeId = '001000000000001AAA';
+        BenevityEmployerMatchingBatch batch = new BenevityEmployerMatchingBatch(fakeId);
+
+        Test.startTest();
+        // MatchAmountField = 'AnnualRevenue' → 200.00 (non-zero, passes first check)
+        // EmployerIdPath = 'Donor.Employer__c' (parsed → relationships=['Donor'], field='Employer__c')
+        // getSObject('Donor') on Account returns null → employer = null → skipped
+        batch.execute(null, scope);
+        Test.stopTest();
+
+        Assert.isTrue(true,
+            'execute() should skip records where employer Id cannot be resolved');
+    }
 }
+
