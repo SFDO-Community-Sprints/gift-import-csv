@@ -13,7 +13,7 @@ trigger AddAccountMPValues on Account (before insert, before update) {
             if (!String.isBlank(rec.LastName)) {
                 List<String> lastCodes = DoubleMetaphoneUtil.doubleMetaphone(rec.LastName);
                 
-                rec.LastName_MP_Secondary__c = lastCodes[0];
+                rec.LastName_MP_Primary__c   = lastCodes[0];
                 rec.LastName_MP_Secondary__c = lastCodes[1];
             }
         }
