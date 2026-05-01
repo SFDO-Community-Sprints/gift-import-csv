@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Matching_Employer__c</fullName>
+    <description>Lookup to the employer's Account record. Used by BenevityEmployerMatchingBatch to identify the employer for an individual donor and create a matching gift entry on their behalf. Configure the Employer ID Field Path in Benevity Matching Settings as: Donor.Matching_Employer__c</description>
+    <externalId>false</externalId>
+    <label>Matching Employer</label>
+    <referenceTo>Account</referenceTo>
+    <relationshipLabel>Matched Employees</relationshipLabel>
+    <relationshipName>Matched_Employees</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>
