@@ -83,6 +83,57 @@ private class GiftEntryMatchingBatchTest {
     }
 
     @IsTest
+    static void testTokenSubstitution_DateOffsetMinus() {
+        // {!GiftEntry.GiftReceivedDate-10} should subtract 10 days
+        Map<String, Object> fm = new Map<String, Object>{
+            'GiftReceivedDate' => Date.newInstance(2024, 3, 11)
+        };
+        String result = GiftEntryMatchingRuleEvaluator.substituteTokens(
+            'DueDate >= {!GiftEntry.GiftReceivedDate-10}', fm
+        );
+        // March 11 - 10 days = March 1
+        Assert.areEqual('DueDate >= 2024-03-01', result,
+            'Date minus offset should subtract days correctly');
+    }
+
+    @IsTest
+    static void testTokenSubstitution_DateOffsetPlus() {
+        // {!GiftEntry.GiftReceivedDate+10} should add 10 days
+        Map<String, Object> fm = new Map<String, Object>{
+            'GiftReceivedDate' => Date.newInstance(2024, 3, 11)
+        };
+        String result = GiftEntryMatchingRuleEvaluator.substituteTokens(
+            'DueDate <= {!GiftEntry.GiftReceivedDate+10}', fm
+        );
+        // March 11 + 10 days = March 21
+        Assert.areEqual('DueDate <= 2024-03-21', result,
+            'Date plus offset should add days correctly');
+    }
+
+    @IsTest
+    static void testTokenSubstitution_PledgeWindowTemplate() {
+        // Full pledge installment window template with both offset tokens
+        Map<String, Object> fm = new Map<String, Object>{
+            'DonorId'         => '001000000000001AAA',
+            'GiftReceivedDate' => Date.newInstance(2024, 3, 11)
+        };
+        String template =
+            'DonorId = {!GiftEntry.DonorId} AND Status = \'Active\' ' +
+            'AND Id IN (SELECT GiftCommitmentId FROM GiftTransaction ' +
+            'WHERE Status = \'Unpaid\' ' +
+            'AND DueDate >= {!GiftEntry.GiftReceivedDate-10} ' +
+            'AND DueDate <= {!GiftEntry.GiftReceivedDate+10})';
+
+        String result = GiftEntryMatchingRuleEvaluator.substituteTokens(template, fm);
+
+        Assert.isTrue(result.contains('2024-03-01'), 'Lower date bound should be March 1');
+        Assert.isTrue(result.contains('2024-03-21'), 'Upper date bound should be March 21');
+        Assert.isTrue(result.contains('001000000000001AAA'), 'DonorId should be substituted');
+    }
+
+
+
+    @IsTest
     static void testTokenSubstitution_DateTimeField() {
         Map<String, Object> fm = new Map<String, Object>{
             'LastProcessedDateTime' => DateTime.newInstanceGmt(2024, 6, 1, 12, 0, 0)

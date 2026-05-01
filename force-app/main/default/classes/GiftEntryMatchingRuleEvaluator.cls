@@ -13,8 +13,13 @@
  */
 public with sharing class GiftEntryMatchingRuleEvaluator {
 
-    /** Token regex: matches {!GiftEntry.SomeField} */
-    private static final Pattern TOKEN_PATTERN = Pattern.compile('\\{!GiftEntry\\.([A-Za-z0-9_]+)\\}');
+    /**
+     * Token regex: matches {!GiftEntry.SomeField} or {!GiftEntry.SomeField+10}
+     * or {!GiftEntry.SomeField-10}.
+     * Group 1 = field API name, Group 2 = optional day offset (e.g. "+10" or "-10").
+     */
+    private static final Pattern TOKEN_PATTERN =
+        Pattern.compile('\\{!GiftEntry\\.([A-Za-z0-9_]+)([+-]\\d+)?\\}');
 
     /**
      * Holds the result of a rule evaluation for one GiftEntry / one TargetField.
@@ -105,12 +110,19 @@ public with sharing class GiftEntryMatchingRuleEvaluator {
     }
 
     /**
-     * Replaces all {!GiftEntry.FieldName} tokens in the WHERE clause template
-     * with the actual values from the GiftEntry record.
+     * Replaces all {!GiftEntry.FieldName} (and {!GiftEntry.FieldName±N}) tokens
+     * in the WHERE clause template with the actual values from the GiftEntry record.
      *
-     * - String values are single-quoted and escaped.
-     * - Date/DateTime values are formatted as SOQL literals.
-     * - Null-valued tokens cause the method to return null (rule is skipped).
+     * Supported token forms:
+     *   {!GiftEntry.Email}              → substitutes the raw field value
+     *   {!GiftEntry.GiftReceivedDate-10} → Date field value minus 10 days
+     *   {!GiftEntry.GiftReceivedDate+10} → Date field value plus 10 days
+     *
+     * Rules:
+     *   - String/Id values are single-quoted and escaped automatically.
+     *   - Date/DateTime values are formatted as SOQL literals (no surrounding quotes).
+     *   - Day offsets are only applied to Date and DateTime field values.
+     *   - Null-valued tokens cause the method to return null (rule is skipped).
      */
     @TestVisible
     private static String substituteTokens(String template, Map<String, Object> entryFields) {
@@ -122,26 +134,36 @@ public with sharing class GiftEntryMatchingRuleEvaluator {
         Matcher m = TOKEN_PATTERN.matcher(template);
 
         while (m.find()) {
-            String fieldName = m.group(1);
+            String fieldName  = m.group(1);           // e.g. 'GiftReceivedDate'
+            String offsetStr  = m.group(2);           // e.g. '-10', '+10', or null
             Object fieldValue = entryFields.get(fieldName);
 
             if (fieldValue == null) {
-                // Log the exact token that failed so the user can fix the field name
                 System.debug(LoggingLevel.WARN,
                     'GiftEntryMatchingRuleEvaluator.substituteTokens: token {!GiftEntry.'
-                    + fieldName + '} resolved to NULL. '
+                    + fieldName + (offsetStr != null ? offsetStr : '') + '} resolved to NULL. '
                     + 'Check that this field API name exists on GiftEntry and is populated. '
                     + 'Available fields on this entry: ' + entryFields.keySet());
-                // Cannot match on a null field — skip this rule
                 return null;
+            }
+
+            // Apply day offset if present (only meaningful for Date / DateTime fields)
+            if (offsetStr != null) {
+                // Strip leading '+' so Integer.valueOf handles both '+10' and '-10'
+                Integer days = Integer.valueOf(offsetStr.replace('+', ''));
+                if (fieldValue instanceof Date) {
+                    fieldValue = ((Date) fieldValue).addDays(days);
+                } else if (fieldValue instanceof DateTime) {
+                    fieldValue = ((DateTime) fieldValue).addDays(days);
+                }
+                // For non-date types the offset is silently ignored
             }
 
             System.debug(LoggingLevel.INFO,
                 'GiftEntryMatchingRuleEvaluator.substituteTokens: token {!GiftEntry.'
-                + fieldName + '} → ' + fieldValue);
+                + fieldName + (offsetStr != null ? offsetStr : '') + '} → ' + fieldValue);
 
             String soqlLiteral = toSoqlLiteral(fieldValue);
-            // Replace all occurrences of this specific token
             result = result.replace(m.group(0), soqlLiteral);
         }
 

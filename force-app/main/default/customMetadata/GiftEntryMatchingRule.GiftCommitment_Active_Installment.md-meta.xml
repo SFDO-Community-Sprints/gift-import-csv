@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>GiftCommitment - Active Installment</label>
+    <protected>false</protected>
+    <values>
+        <field>IsActive__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>TargetField__c</field>
+        <value xsi:type="xsd:string">GiftCommitmentId</value>
+    </values>
+    <values>
+        <field>TargetObject__c</field>
+        <value xsi:type="xsd:string">GiftCommitment</value>
+    </values>
+    <values>
+        <field>Priority__c</field>
+        <value xsi:type="xsd:double">10</value>
+    </values>
+    <values>
+        <field>Weight__c</field>
+        <value xsi:type="xsd:double">0.9</value>
+    </values>
+    <values>
+        <!--
+            This rule mirrors NPC's built-in pledge matching logic:
+
+            1. Donor must match the already-resolved DonorId (step 1 in the batch pipeline).
+            2. GiftCommitment must be Active with an EffectiveStartDate.
+            3. An unpaid GiftTransaction must exist whose DueDate falls within ±N days
+               of the GiftEntry's GiftReceivedDate — replicating the "Installment Extension
+               Day Count" window from General Fundraising Settings.
+
+            TOKEN SYNTAX:
+              {!GiftEntry.FieldName}    → raw field value
+              {!GiftEntry.FieldName-N}  → field value minus N days  (Date fields only)
+              {!GiftEntry.FieldName+N}  → field value plus  N days  (Date fields only)
+
+            ADJUST BEFORE USE:
+              • Change the ±10 offset to match your org's Installment Extension Day Count.
+              • Verify GiftTransaction field API names:
+                  - GiftCommitmentId  (lookup back to GiftCommitment)
+                  - DueDate           (scheduled payment due date)
+                  - Status            (expected value: 'Unpaid')
+              • If GiftTransaction uses different field names in your NPC version,
+                update this WHERE clause accordingly.
+        -->
+        <field>SoqlWhereClause__c</field>
+        <value xsi:type="xsd:string">DonorId = {!GiftEntry.DonorId} AND Status = &apos;Active&apos; AND EffectiveStartDate != null AND Id IN (SELECT GiftCommitmentId FROM GiftTransaction WHERE Status = &apos;Unpaid&apos; AND DueDate &gt;= {!GiftEntry.GiftReceivedDate-10} AND DueDate &lt;= {!GiftEntry.GiftReceivedDate+10})</value>
+    </values>
+</CustomMetadata>
