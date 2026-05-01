@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Donor - Match by Metaphone Names</label>
+    <protected>false</protected>
+    <values>
+        <field>IsActive__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Priority__c</field>
+        <value xsi:type="xsd:double">30.0</value>
+    </values>
+    <values>
+        <field>SoqlWhereClause__c</field>
+        <value xsi:type="xsd:string">
+            DonorId != null 
+            AND ((FirstName_MP_Primary__c = {!GiftEntry.FirstName_MP_Primary__c} OR FirstName_MP_Primary__c = {!GiftEntry.FirstName_MP_Secondary__c} OR FirstName_MP_Secondary__c = {!GiftEntry.FirstName_MP_Primary__c} OR FirstName_MP_Secondary__c = {!GiftEntry.FirstName_MP_Secondary__c}) 
+            AND (LastName_MP_Primary__c = {!GiftEntry.LastName_MP_Primary__c} OR LastName_MP_Primary__c = {!GiftEntry.LastName_MP_Secondary__c} OR LastName_MP_Secondary__c = {!GiftEntry.LastName_MP_Primary__c} OR LastName_MP_Secondary__c = {!GiftEntry.LastName_MP_Secondary__c}))
+            AND Last4 = {!GiftEntry.Last4}
+            AND ((HomePhone != null OR MobilePhone != null) AND (HomePhone = {!GiftEntry.HomePhone}) OR MobilePhone = {!GiftEntry.MobilePhone} OR HomePhone = {!GiftEntry.MobilePhone} OR MobilePhone = {!GiftEntry.HomePhone})))
+        </value>
+    </values>
+    <values>
+        <field>TargetField__c</field>
+        <value xsi:type="xsd:string">DonorId</value>
+    </values>
+    <values>
+        <field>TargetObject__c</field>
+        <value xsi:type="xsd:string">GiftEntry</value>
+    </values>
+    <values>
+        <field>Weight__c</field>
+        <value xsi:type="xsd:double">0.85</value>
+    </values>
+</CustomMetadata>

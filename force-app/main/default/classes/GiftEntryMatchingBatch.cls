@@ -40,7 +40,10 @@ public with sharing class GiftEntryMatchingBatch
     private static final Set<String> BASE_GIFT_ENTRY_FIELDS = new Set<String>{
         'Id', 'Name', 'GiftBatchId', 'GiftReceivedDate',
         // Donor identity
-        'Salutation', 'FirstName', 'LastName', 'OrganizationName',
+        'Salutation', 'FirstName', 'LastName', 
+        // Metaphone fields for fuzzy matching
+        'FirstName_MP_Primary__c', 'LastName_MP_Primary__c', 'FirstName_MP_Secondary__c', 'LastName_MP_Secondary__c',
+        'OrganizationName',
         'Email', 'HomePhone', 'MobilePhone',
         // Address
         'Street', 'City', 'State', 'PostalCode', 'Country',
@@ -159,6 +162,7 @@ public with sharing class GiftEntryMatchingBatch
         System.debug(LoggingLevel.INFO,
             'GiftEntryMatchingBatch.start: querying GiftEntry with fields: ' + selectFields);
 
+            // add new fields
         String soql = 'SELECT ' + String.join(new List<String>(selectFields), ', ')
                     + ' FROM GiftEntry'
                     + ' WHERE GiftBatchId = :giftBatchId'
