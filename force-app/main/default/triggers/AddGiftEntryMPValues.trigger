@@ -2,7 +2,7 @@ trigger AddGiftEntryMPValues on GiftEntry (before insert, before update) {
 
     for (GiftEntry rec : Trigger.new) {
 
-        if (rec.FirstName != Trigger.oldMap.get(rec.id).FirstName || rec.LastName != Trigger.oldMap.get(rec.id).LastName) {
+        if ((rec.FirstName != Trigger.oldMap.get(rec.id).FirstName || rec.LastName != Trigger.oldMap.get(rec.id).LastName) || Trigger.isInsert) {
 
             if (!String.isBlank(rec.FirstName)) {
                 List<String> firstCodes = DoubleMetaphoneUtil.doubleMetaphone(rec.FirstName);
