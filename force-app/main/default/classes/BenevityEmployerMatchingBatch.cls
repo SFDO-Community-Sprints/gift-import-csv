@@ -17,9 +17,12 @@
  *                               onto the new employer gift entry
  *                               (e.g. "GiftBatchId;GiftReceivedDate;CurrencyIsoCode")
  *   MatchAmountField__c       — API name of the GiftEntry field holding the employer
- *                               match amount (e.g. "GEM_MatchAmount__c")
+ *                               match amount (e.g. "Matching_Gift_Amount__c")
  *   MatchFlagField__c         — API name of a boolean GiftEntry field set to true after
  *                               the employer gift is created (e.g. "GEM_MatchingGiftCreated__c")
+ *   DefaultPaymentMethod__c   — Fallback PaymentMethod picklist value applied to the new
+ *                               employer gift when PaymentMethod is not in FieldsToCopy__c
+ *                               or its copied value is blank (e.g. "Check", "EFT", "Other")
  *
  * For each eligible employee GiftEntry the batch will:
  *   1. Resolve the employer Account Id by traversing EmployerIdPath__c.
@@ -129,7 +132,7 @@ public with sharing class BenevityEmployerMatchingBatch
 
             // ── 3. Build new employer GiftEntry ───────────────────────────
             SObject employerGift = buildEmployerGift(
-                entry, employerId, matchAmount, fieldsToCopy
+                entry, employerId, matchAmount, fieldsToCopy, s.DefaultPaymentMethod__c
             );
             newEmployerGifts.add(employerGift);
 
@@ -304,15 +307,18 @@ public with sharing class BenevityEmployerMatchingBatch
      *   1. Copying all requested fields from the source entry.
      *   2. Overriding DonorId with the employer Account Id.
      *   3. Overriding GiftAmount with the match amount.
+     *   4. Applying defaultPaymentMethod as a fallback if PaymentMethod was not
+     *      copied or its copied value is blank.
      * Fields that cannot be set (system fields, formula, etc.) are silently skipped
      * with a WARN log so a misconfigured FieldsToCopy__c never crashes the batch.
      */
     @TestVisible
     private static SObject buildEmployerGift(
-        SObject sourceEntry,
-        Id employerId,
-        Decimal matchAmount,
-        List<String> fieldsToCopy
+        SObject      sourceEntry,
+        Id           employerId,
+        Decimal      matchAmount,
+        List<String> fieldsToCopy,
+        String       defaultPaymentMethod
     ) {
         SObject employerGift = sourceEntry.getSObjectType().newSObject();
 
@@ -330,8 +336,30 @@ public with sharing class BenevityEmployerMatchingBatch
         }
 
         // These always override whatever was copied
-        employerGift.put('DonorId',     employerId);
-        employerGift.put('GiftAmount',  matchAmount);
+        employerGift.put('DonorId',    employerId);
+        employerGift.put('GiftAmount', matchAmount);
+
+        // Apply default PaymentMethod only when the field is still blank after copying
+        if (String.isNotBlank(defaultPaymentMethod)) {
+            Object currentPaymentMethod = null;
+            try {
+                currentPaymentMethod = employerGift.get('PaymentMethod');
+            } catch (Exception e) {
+                // Field may not exist on this SObject type — skip silently
+            }
+            if (currentPaymentMethod == null || String.isBlank(String.valueOf(currentPaymentMethod))) {
+                try {
+                    employerGift.put('PaymentMethod', defaultPaymentMethod.trim());
+                    System.debug(LoggingLevel.INFO,
+                        'BenevityEmployerMatchingBatch.buildEmployerGift: applied default '
+                        + 'PaymentMethod="' + defaultPaymentMethod.trim() + '"');
+                } catch (Exception e) {
+                    System.debug(LoggingLevel.WARN,
+                        'BenevityEmployerMatchingBatch.buildEmployerGift: could not set '
+                        + 'default PaymentMethod: ' + e.getMessage());
+                }
+            }
+        }
 
         return employerGift;
     }

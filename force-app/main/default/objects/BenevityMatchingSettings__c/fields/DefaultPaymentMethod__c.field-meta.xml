@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>DefaultPaymentMethod__c</fullName>
+    <description>Default value for the PaymentMethod field on newly created employer GiftEntry records. Applied only when PaymentMethod is not included in FieldsToCopy__c or when its copied value is blank. Must match a valid PaymentMethod picklist value (e.g. Check, Credit Card, EFT, Cash, In Kind, Other). Leave blank to rely entirely on FieldsToCopy__c.</description>
+    <externalId>false</externalId>
+    <label>Default Payment Method</label>
+    <length>50</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>
